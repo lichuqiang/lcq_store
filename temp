@@ -1,0 +1,32 @@
+mailto:orain.xiong@gmail.com
+Hi,
+
+我们这边产品也有类似的问题，主要的矛盾点在于node crash以后绑定的local pv无法解绑，pod 没办法重调度到其他节点上
+针对你提出的两点：
+1.	实例高可用
+这个也是我们这边的需求，就像我上面描述的那样，针对这个问题，Michelle她们的想法是local storage本身是特定于node的，不应该支持迁移，应该算作是一种约束。
+但是这种规格没办法满足我们的应用场景，后面我会尝试和她沟通，如果社区不同意做改变的话，我想只能我们内部版本做定制化的修改
+2．数据零丢失
+这个我认为不应该是local storage应该支持的场景，因为volume本身是某个节点提供的。应用本身应该具有自恢复的能力，以etcd为例，只要多数member存活，挂掉一个实例后，重新拉起的实例会自动从其他实例同步数据。
+如果一定要求保留每个节点上的数据。我想可能需要额外的备份介入
+
+From: orain.xiong orain.xiong [mailto:orain.xiong@gmail.com] 
+Sent: 2018年3月26日 15:59
+To: lichuqiang <lichuqiang@huawei.com>
+Subject: 请教个 local volume scheduling 的问题
+
+ Hi, 
+
+您好, 冒昧的给您写邮件,
+
+看到您作为 member of k8s, 想请教一下
+
+使用 local volume 大多是是 latency sensitive 类型 workload. 
+
+多以数据库为主, 这类应用大多数又有两个强需求:
+* 实例高可用
+* 数据零丢失
+
+一旦使用local volume, 便使得 pod 跟 node 建立强关联.
+
+实例高可用和数据零丢失都不能得到保障. 不太理解 local volume scheduling 的使用场景
